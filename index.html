@@ -100,6 +100,68 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible{
 .a-tilt.a-in{transform:perspective(900px) rotateY(-18deg) translateY(40px) rotate(-2deg)}
 .a-tilt.a-in.vis{transform:rotate(-2deg)}
 .bg-layer{transition:opacity .9s ease}
+/* ============================================================
+   MICRO-INTERACTIONS — every element reacts in its own way
+   ============================================================ */
+/* section titles: letters wave under the cursor (spans added by JS) */
+.section-title .ch{display:inline-block;transition:transform .32s cubic-bezier(.34,1.56,.64,1)}
+.section-title:hover .ch{transform:translateY(-7px) rotate(4deg);color:var(--pwb-red)}
+.hero h1{transition:transform .3s, text-shadow .3s}
+.hero h1:hover{transform:scale(1.02) rotate(-.6deg);text-shadow:0 7px 0 rgba(43,20,0,.3)}
+.kicker{transition:letter-spacing .35s ease, color .3s}
+.kicker:hover{letter-spacing:.36em;color:var(--pwb-gold)}
+/* bold text: yellow marker sweeps under it */
+p strong{background:linear-gradient(120deg,var(--pwb-yellow),var(--pwb-yellow)) no-repeat 0 72%;
+  background-size:0% 42%;transition:background-size .35s ease;padding:0 2px;border-radius:3px}
+p:hover strong{background-size:100% 42%}
+/* WHY cards: each icon reacts differently */
+.why-grid .card:nth-child(1):hover .icon-circle{animation:iFlex .6s ease}
+.why-grid .card:nth-child(2):hover .icon-circle{animation:iSpin .7s cubic-bezier(.34,1.3,.5,1)}
+.why-grid .card:nth-child(3):hover .icon-circle{animation:iNod .6s ease}
+.why-grid .card:hover .big-stat{animation:statPop .45s ease;color:var(--pwb-gold)}
+@keyframes iFlex{0%,100%{transform:scale(1)}25%{transform:scale(1.25,.85)}50%{transform:scale(.9,1.15)}75%{transform:scale(1.12,.95)}}
+@keyframes iSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes iNod{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}60%{transform:rotate(12deg)}}
+@keyframes statPop{0%{transform:scale(1)}45%{transform:scale(1.28)}100%{transform:scale(1)}}
+/* SOCIAL cards: flash / bounce / play-pulse */
+.social-grid .social-card:nth-child(1):hover .icon-circle{animation:iFlash .55s ease}
+.social-grid .social-card:nth-child(2):hover .icon-circle{animation:iBounce .55s cubic-bezier(.34,1.56,.64,1)}
+.social-grid .social-card:nth-child(3):hover .icon-circle{animation:iPlay .6s ease}
+.social-card .handle{transition:color .25s, letter-spacing .25s}
+.social-card:hover .handle{color:var(--pwb-gold);letter-spacing:.03em}
+@keyframes iFlash{0%,100%{background:var(--pwb-yellow)}40%{background:#fff;transform:scale(1.12)}}
+@keyframes iBounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}70%{transform:translateY(3px)}}
+@keyframes iPlay{0%{transform:scale(1)}30%{transform:scale(.82)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+/* founder card: photo zooms, name gets its underline drawn */
+.founder-card .photo img{transition:transform .5s ease}
+.founder-card:hover .photo img{transform:scale(1.07)}
+.founder-card .fc-name{position:relative}
+.founder-card .fc-name::after{content:'';position:absolute;left:20%;right:80%;bottom:0;height:3px;
+  background:var(--pwb-yellow);border-radius:2px;transition:right .35s ease}
+.founder-card:hover .fc-name::after{right:20%}
+/* nav links bop; ticker pauses under the cursor */
+nav.links a:hover{animation:navBop .35s ease}
+@keyframes navBop{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.marquee:hover .marquee-track{animation-play-state:paused}
+/* loyalty step numbers spin; stamps wobble */
+.loyalty-steps li:hover::before{animation:iSpin .5s ease}
+.stamp:hover{animation:iWobble .45s ease}
+@keyframes iWobble{0%,100%{transform:scale(1) rotate(0)}30%{transform:scale(1.15) rotate(8deg)}65%{transform:scale(1.08) rotate(-7deg)}}
+/* lucky badge shakes excitedly */
+.lucky-badge:hover{animation:badgeShake .5s ease}
+@keyframes badgeShake{0%,100%{transform:rotate(0)}20%{transform:rotate(-5deg) scale(1.05)}45%{transform:rotate(5deg) scale(1.06)}70%{transform:rotate(-3deg) scale(1.04)}}
+/* hours rows highlight; footer links hatch an egg */
+.hours-table tr{transition:background .25s}
+.hours-table tr:hover{background:var(--pwb-cream)}
+footer ul a{position:relative;display:inline-block;transition:color .25s, transform .25s}
+footer ul a::before{content:'🍳';position:absolute;left:-22px;opacity:0;transition:opacity .25s, transform .25s;transform:scale(.5)}
+footer ul a:hover{transform:translateX(20px)}
+footer ul a:hover::before{opacity:1;transform:scale(1)}
+
+/* straight cards: JS gives them scroll-parallax + float; cursor gives tilt */
+.why-grid .card, .social-grid .social-card, .founder-card{will-change:transform}
+.a-fade.a-in{transform:none !important;transition:opacity .7s ease !important}
+.a-fade.a-in.vis{transform:none !important}
 .float-egg{animation:eggDrift 9s ease-in-out infinite alternate}
 .float-egg:nth-of-type(odd){animation-duration:12s;animation-delay:-4s}
 @keyframes eggDrift{from{transform:translateY(-26px) rotate(-10deg)}to{transform:translateY(26px) rotate(12deg)}}
@@ -511,6 +573,12 @@ section > .wrap{position:relative;z-index:1}
    RESPONSIVE
    ============================================================ */
 @media (max-width:920px){
+  /* mobile: hero is a normal section (no pin), pan rides along, no fall scene */
+  .hero-pin{height:auto}
+  .hero-sticky{position:relative;height:auto;min-height:100svh;padding:84px 20px 64px}
+  .scroll-hint{display:none}
+  #fallEgg,#shellL,#shellR,.fin-egg{display:none}
+  #panLayer{width:min(300px,72vw)}
   .hero-grid{grid-template-columns:1fr;text-align:center}
   .hero .btn-row{justify-content:center}
   .hero p.lede{margin-inline:auto}
@@ -1179,9 +1247,12 @@ section > .wrap{position:relative;z-index:1}
   /* ---------- entrances: IntersectionObserver + CSS transitions ---------- */
   var io = new IntersectionObserver(function(entries){
     entries.forEach(function(en){
-      en.target.classList.toggle('vis', en.isIntersecting);
+      if(en.isIntersecting){
+        en.target.classList.add('vis');   /* one-shot: settle flat and stay */
+        io.unobserve(en.target);
+      }
     });
-  }, {rootMargin: '-6% 0px -6% 0px', threshold: 0});
+  }, {rootMargin: '-4% 0px -4% 0px', threshold: 0});
   function tag(el, cls, delay){
     if(!el) return;
     el.classList.add('a-in');
@@ -1191,11 +1262,11 @@ section > .wrap{position:relative;z-index:1}
   }
   document.querySelectorAll('main section .wrap').forEach(function(w){ tag(w); });
   document.querySelectorAll('.why-grid .card, .social-grid .social-card').forEach(function(c, i){
-    tag(c, (i%2 ? 'a-flip-r' : 'a-flip-l'), (i%3)*90);
+    tag(c, 'a-fade', (i%3)*120);
   });
   tag(document.getElementById('stampCard'), 'a-tilt');
   tag(document.querySelector('.lucky-badge'), 'a-pop');
-  tag(document.querySelector('.founder-card'), 'a-flip-l');
+  tag(document.querySelector('.founder-card'), 'a-fade');
   tag(document.querySelector('.footer-grid'));
 
   /* ---------- cached geometry (measured once + on resize) ---------- */
@@ -1221,9 +1292,18 @@ section > .wrap{position:relative;z-index:1}
         x: parseFloat(el.dataset.x), y: parseFloat(el.dataset.y), start:'', fin:''};
     });
 
+  /* cards that animate on their own while scrolling (straight: no tilt) */
+  var liveCards = [];
+  document.querySelectorAll('.founder-card, .why-grid .card, .social-grid .social-card')
+    .forEach(function(el, i){ liveCards.push({el:el, top:0, h:1, ph:i*1.25}); });
+
   function measure(){
     vw = window.innerWidth; vh = window.innerHeight;
     var sy = window.scrollY;
+    liveCards.forEach(function(lc){
+      var r = lc.el.getBoundingClientRect();
+      lc.top = r.top + window.scrollY; lc.h = r.height;
+    });
     maxSy = Math.max(1, document.documentElement.scrollHeight - vh);
     if(pin){
       var pr = pin.getBoundingClientRect();
@@ -1259,7 +1339,7 @@ section > .wrap{position:relative;z-index:1}
     /* hero egg-crack scene: only while the hero is on screen */
     if(sy < pinTop + pinH){
       heroDoneWritten = false;
-      var hp = clamp01((sy - pinTop) / (pinH - vh));
+      var hp2 = clamp01((sy - pinTop) / (pinH - vh)), hp = hp2;
       if(!isMobile){
         var fp = seg(hp, .02, .42), f2 = fp*fp;
         var cracked = fp >= 1;
@@ -1289,16 +1369,25 @@ section > .wrap{position:relative;z-index:1}
         }
         if(hint) hint.style.opacity = String((1 - seg(hp,0,.12)).toFixed(2));
       }
-      /* pan parked over its slot (sticky position derived mathematically) */
+      /* pan parked over its slot */
       if(panLayer && panSpace){
-        var ctv = pinTop - sy;
-        var stickyTopV = ctv > 0 ? ctv : (ctv + pinH - vh < 0 ? ctv + pinH - vh : 0);
         var lh = panLW * 320/380;
-        var pj = seg(hp,.42,.56), squash = Math.sin(pj*Math.PI)*.05;
-        panLayer.style.opacity = String((1 - seg(sy, pinTop + pinH - vh, pinTop + pinH - vh*.3)).toFixed(2));
-        panLayer.style.transform =
-          'translate3d(' + (panRelX - panLW/2).toFixed(1) + 'px,' + (stickyTopV + panRelY - lh/2).toFixed(1) + 'px,0)' +
-          ' scale(' + (heroScale*(1+squash)).toFixed(3) + ',' + (heroScale*(1-squash)).toFixed(3) + ')';
+        if(isMobile){
+          var mr = panSpace.getBoundingClientRect();
+          var msc = mr.width / panLW;
+          panLayer.style.opacity = String(clamp01(mr.bottom / (vh*.35)).toFixed(2));
+          panLayer.style.transform =
+            'translate3d(' + (mr.left + mr.width/2 - panLW/2).toFixed(1) + 'px,' + (mr.top + mr.height/2 - lh/2).toFixed(1) + 'px,0)' +
+            ' scale(' + msc.toFixed(3) + ')';
+        } else {
+          var ctv = pinTop - sy;
+          var stickyTopV = ctv > 0 ? ctv : (ctv + pinH - vh < 0 ? ctv + pinH - vh : 0);
+          var pj = seg(hp2,.42,.56), squash = Math.sin(pj*Math.PI)*.05;
+          panLayer.style.opacity = String((1 - seg(sy, pinTop + pinH - vh, pinTop + pinH - vh*.3)).toFixed(2));
+          panLayer.style.transform =
+            'translate3d(' + (panRelX - panLW/2).toFixed(1) + 'px,' + (stickyTopV + panRelY - lh/2).toFixed(1) + 'px,0)' +
+            ' scale(' + (heroScale*(1+squash)).toFixed(3) + ',' + (heroScale*(1-squash)).toFixed(3) + ')';
+        }
       }
     } else if(!heroDoneWritten){
       if(panLayer) panLayer.style.opacity = '0';
@@ -1339,20 +1428,83 @@ section > .wrap{position:relative;z-index:1}
   setTimeout(measure, 1500);
   measure();
 
+  /* ---------- live cards: scroll parallax + continuous float ---------- */
+  (function loop(now){
+    var sy = window.scrollY;
+    for(var i=0;i<liveCards.length;i++){
+      var lc = liveCards[i];
+      if(lc.el._hov) continue;                        /* cursor owns it right now */
+      var top = lc.top - sy;
+      if(top + lc.h < -80 || top > vh + 80) continue; /* off-screen: skip */
+      var d = (top + lc.h/2 - vh/2) / (vh/2 + lc.h/2);
+      d = Math.max(-1, Math.min(1, d));
+      var ty = d * -34;                               /* straight parallax rise */
+      var sc = 1 - Math.abs(d)*.055;                  /* breathes with position */
+      var fl = Math.sin(now/850 + lc.ph) * 5;         /* its own gentle float */
+      lc.el.style.transform = 'translateY(' + (ty + fl).toFixed(1) + 'px) scale(' + sc.toFixed(3) + ')';
+    }
+    requestAnimationFrame(loop);
+  })(0);
+
   /* ---------- 3D hover tilt on cards (event-driven, inline) ---------- */
   if(window.matchMedia('(hover: hover)').matches){
     document.querySelectorAll('.card, .social-card, .founder-card').forEach(function(el){
       var hr = null;
-      el.addEventListener('mouseenter', function(){ hr = el.getBoundingClientRect(); });
+      el.addEventListener('mouseenter', function(){
+        el._hov = true;                          /* cursor takes over from the float */
+        hr = el.getBoundingClientRect();
+      });
       el.addEventListener('mousemove', function(e){
         if(!hr) return;
-        var rx = ((e.clientY - hr.top)/hr.height - .5) * -8;
-        var ry = ((e.clientX - hr.left)/hr.width - .5) * 8;
-        el.style.transform = 'perspective(800px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateY(-6px)';
+        var rx = ((e.clientY - hr.top)/hr.height - .5) * -10;
+        var ry = ((e.clientX - hr.left)/hr.width - .5) * 10;
+        el.style.transform = 'perspective(800px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateY(-8px) scale(1.02)';
       });
-      el.addEventListener('mouseleave', function(){ hr = null; el.style.transform = ''; });
+      el.addEventListener('mouseleave', function(){
+        hr = null; el._hov = false; el.style.transform = '';
+      });
     });
   }
+})();
+
+/* ============================================================
+   TEXT INTERACTIVITY — wave titles + counting stats
+   ============================================================ */
+(function(){
+  if(!window.matchMedia('(hover: hover)').matches) return;
+  /* split section titles into letters so they wave under the cursor */
+  document.querySelectorAll('.section-title').forEach(function(t){
+    if(t.children.length) return;               /* plain-text titles only */
+    var txt = t.textContent, out = '', i;
+    for(i=0;i<txt.length;i++){
+      out += (txt[i] === ' ') ? ' '
+        : '<span class="ch" style="transition-delay:' + (i*14) + 'ms">' + txt[i].replace('&','&amp;').replace('<','&lt;') + '</span>';
+    }
+    t.innerHTML = out;
+  });
+  /* stats count up when you hover their card */
+  function countUp(el, target, fmt){
+    if(el._counting) return;
+    el._counting = true;
+    var t0 = null;
+    function step(ts){
+      if(t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0)/600);
+      var v = Math.round(target * (1 - Math.pow(1-p, 3)));
+      el.textContent = fmt.replace('#', String(v));
+      if(p < 1) requestAnimationFrame(step);
+      else el._counting = false;
+    }
+    requestAnimationFrame(step);
+  }
+  var stats = document.querySelectorAll('.why-grid .card .big-stat');
+  var cfg = [{n:6, f:'~#g'}, {n:5, f:'# min'}, null];   /* third stat pulses via CSS */
+  document.querySelectorAll('.why-grid .card').forEach(function(card, i){
+    if(!cfg[i]) return;
+    card.addEventListener('mouseenter', function(){
+      countUp(stats[i], cfg[i].n, cfg[i].f);
+    });
+  });
 })();
 
 /* ============================================================
