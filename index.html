@@ -89,6 +89,22 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible{
 .btn-outline-light{background:transparent;color:var(--pwb-white);border:3px solid var(--pwb-white)}
 
 /* ============================================================
+   EVENT-DRIVEN 3D ENTRANCES (GPU only — zero scroll-frame JS)
+   ============================================================ */
+.a-in{opacity:0;transform:perspective(1100px) rotateX(10deg) translateY(48px);
+  transition:transform .8s cubic-bezier(.22,1,.36,1),opacity .55s ease}
+.a-in.vis{opacity:1;transform:none}
+.a-flip-l.a-in{transform:perspective(900px) rotateY(-24deg) translateY(40px)}
+.a-flip-r.a-in{transform:perspective(900px) rotateY(24deg) translateY(40px)}
+.a-pop.a-in{transform:perspective(900px) scale(.45) translateY(60px)}
+.a-tilt.a-in{transform:perspective(900px) rotateY(-18deg) translateY(40px) rotate(-2deg)}
+.a-tilt.a-in.vis{transform:rotate(-2deg)}
+.bg-layer{transition:opacity .9s ease}
+.float-egg{animation:eggDrift 9s ease-in-out infinite alternate}
+.float-egg:nth-of-type(odd){animation-duration:12s;animation-delay:-4s}
+@keyframes eggDrift{from{transform:translateY(-26px) rotate(-10deg)}to{transform:translateY(26px) rotate(12deg)}}
+
+/* ============================================================
    NAV — light bar like the reference video
    ============================================================ */
 header.nav{
@@ -159,8 +175,14 @@ nav.links a:hover{background:var(--pwb-peach)}
   padding:8px 18px;border-radius:999px;
 }
 .pan-wrap{display:grid;place-items:center}
-.pan-wrap svg{width:min(100%,440px);filter:drop-shadow(0 24px 30px rgba(43,20,0,.35));animation:panFloat 5s ease-in-out infinite}
+.pan-space{width:min(100%,440px);aspect-ratio:380/320}
+#panLayer{position:fixed;top:0;left:0;width:min(440px,40vw);z-index:40;
+  pointer-events:none;transform-origin:50% 50%;will-change:transform}
+#panLayer .pan-svg{width:100%;height:auto;animation:panFloat 5s ease-in-out infinite}
 @keyframes panFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+#finale{position:fixed;inset:0;z-index:41;pointer-events:none}
+.fin-egg{position:fixed;left:0;top:0;opacity:0;will-change:transform,opacity}
+.fin-egg svg{width:100%;height:auto}
 /* sizzle: oil bubbles pop + steam wisps rise */
 .bub{transform-box:fill-box;transform-origin:center;animation:bub 1.6s ease-in-out infinite;opacity:0}
 @keyframes bub{0%,100%{opacity:0;transform:scale(.4)}40%{opacity:.75;transform:scale(1)}70%{opacity:.2;transform:scale(1.25)}}
@@ -423,10 +445,9 @@ html.customcur #cur{display:block}
   overflow:hidden;padding:0 24px}
 .hero-sticky .hero-grid{width:100%}
 .pan-wrap{position:relative}
-#fallEgg,#shellL,#shellR{position:absolute;left:38.5%;top:32%;width:74px;
+#fallEgg,#shellL,#shellR{position:absolute;left:38.5%;top:32%;width:17%;
   pointer-events:none;opacity:0;will-change:transform}
-#fallEgg svg,#shellL svg,#shellR svg{width:100%;height:auto;
-  filter:drop-shadow(0 10px 14px rgba(43,20,0,.3))}
+#fallEgg svg,#shellL svg,#shellR svg{width:100%;height:auto}
 #friedNew{transform-box:fill-box;transform-origin:center}
 .scroll-hint{
   position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
@@ -442,14 +463,15 @@ html.customcur #cur{display:block}
 /* ============================================================
    SEAMLESS BACKGROUND MORPH between sections
    ============================================================ */
-#bgMorph{position:fixed;inset:0;z-index:-1;background:var(--pwb-white)}
+#bgStack{position:fixed;inset:0;z-index:-1;background:var(--pwb-white)}
+.bg-layer{position:absolute;inset:0;opacity:0;will-change:opacity}
 
 /* ============================================================
    3D SCROLL SYSTEM
    ============================================================ */
 section{position:relative}
-section > .wrap{position:relative;z-index:1;will-change:transform}
-.float-egg{position:absolute;pointer-events:none;z-index:0;opacity:.14;will-change:transform}
+section > .wrap{position:relative;z-index:1}
+.float-egg{position:absolute;pointer-events:none;z-index:0;opacity:.14}
 .float-egg svg{width:100%;height:auto}
 .hero-grid{will-change:transform}
 .pan-wrap{will-change:transform}
@@ -541,60 +563,8 @@ section > .wrap{position:relative;z-index:1;will-change:transform}
 </div>
 
 <!-- ================= CUSTOM CURSOR ================= -->
-<div id="cur" aria-hidden="true">
-  <svg class="c-egg" viewBox="0 0 34 40"><path d="M17 2C9 2 3 14 3 24c0 8 6 14 14 14s14-6 14-14C31 14 25 2 17 2z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><ellipse cx="12" cy="14" rx="3.4" ry="5" fill="#FFF8EC" opacity=".9"/></svg>
-  <svg class="c-crack" viewBox="0 0 34 40"><path d="M17 2C9 2 3 14 3 24c0 8 6 14 14 14s14-6 14-14C31 14 25 2 17 2z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><path class="crackline" d="M5 21l5 3 4-4 4 5 5-4 5 3" fill="none" stroke="#2B1400" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="12" cy="12" rx="3" ry="4.4" fill="#FFF8EC" opacity=".9"/></svg>
-  <svg class="c-shl" viewBox="0 0 34 40"><path d="M17 2C9 2 3 14 3 24l4-3 5 4 5-5v-2z" fill="#fff" stroke="#2B1400" stroke-width="2"/></svg>
-  <svg class="c-shr" viewBox="0 0 34 40"><path d="M17 2c8 0 14 12 14 22l-4-3-5 4-5-5v-2z" fill="#fff" stroke="#2B1400" stroke-width="2"/></svg>
-  <svg class="c-fried" viewBox="0 0 44 40"><path d="M22 3c6 0 8 4 13 6 5 2 6 7 4 12s1 8-4 12c-4 3-8 4-13 4-6 0-11-1-15-5C3 28 2 24 4 19c2-4 1-8 5-11s7-5 13-5z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="23" cy="21" r="8" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="20.5" cy="18.5" rx="2.6" ry="1.8" fill="#fff" opacity=".8"/></svg>
-</div>
-
-<div id="bgMorph" aria-hidden="true"></div>
-
-<!-- ================= NAV ================= -->
-<header class="nav">
-  <div class="nav-inner">
-    <a class="brand" href="#top" aria-label="Protein Wala Banda — home">
-      <span class="egg-badge" aria-hidden="true">
-        <svg viewBox="0 0 40 40"><path d="M20 4c-4 0-6 2-9 4s-5 4-5 9c0 3 1 5 0 8s2 8 7 9 10 1 14-1 7-4 7-9c0-3-2-4-1-8s-2-7-5-9-4-3-8-3z" fill="#FFF8EC"/><circle cx="21" cy="21" r="7" fill="#F9C409"/><ellipse cx="19" cy="19" rx="2.4" ry="1.6" fill="#fff" opacity=".85"/></svg>
-      </span>
-      <span class="name">Protein Wala B,anda</span>
-    </a>
-    <div class="nav-right">
-      <nav class="links" id="navLinks" aria-label="Main navigation">
-        <a href="#kahani">Our Story</a>
-        <a href="#loyalty">Loyalty Card</a>
-        <a href="#giveaway">Giveaway</a>
-        <a href="#location">Location</a>
-      </nav>
-      <a class="nav-cta" href="#location">Find the Stall 📍</a>
-      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">Menu ☰</button>
-    </div>
-  </div>
-</header>
-
-<main id="top">
-<!-- ================= HERO (pinned scene: egg falls into the pan) ================= -->
-<div class="hero-pin">
-<section class="hero hero-sticky" aria-label="Welcome">
-  <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
-  <div class="hero-grid">
-    <div>
-      <span class="pill-kicker">🥚 Ande Ka Funda, Protein Ka Dhanda</span>
-      <h1>Garma Garam <span class="yellow">Anda,</span><br>Dil Khush Kare Banda</h1>
-      <p class="lede">
-        High protein street food, made fresh on the tawa and served hot in minutes.
-        Simple, honest and seriously satisfying.
-      </p>
-      <div class="btn-row">
-        <a class="btn btn-yellow" href="#location">Visit the Stall</a>
-        <a class="btn btn-outline-light" href="#loyalty">Get Your Loyalty Card</a>
-      </div>
-      <p class="hero-hint">🥚 Psst… your cursor is an egg. Hover a button to crack it, click to fry it!</p>
-    </div>
-    <div class="pan-wrap" aria-hidden="true">
-      <!-- cast-iron skillet with realistic fried eggs + animated sizzle -->
-      <svg viewBox="0 0 380 320">
+<div id="panLayer" aria-hidden="true">
+<svg class="pan-svg" viewBox="0 0 380 320">
         <defs>
           <radialGradient id="panSteel" cx="42%" cy="36%" r="80%">
             <stop offset="0" stop-color="#4A4A4A"/><stop offset=".55" stop-color="#2E2E2E"/><stop offset="1" stop-color="#151515"/>
@@ -658,9 +628,78 @@ section > .wrap{position:relative;z-index:1;will-change:transform}
         <path class="steam" style="animation-delay:.9s" d="M178 28c5-9 -3-14 3-24" stroke="#FFF8EC" stroke-width="5" stroke-linecap="round" fill="none"/>
         <path class="steam" style="animation-delay:1.8s" d="M244 44c5-9 -3-14 3-24" stroke="#FFF8EC" stroke-width="5" stroke-linecap="round" fill="none"/>
       </svg>
-      <div id="fallEgg"><svg viewBox="0 0 34 40"><path d="M17 2C9 2 3 14 3 24c0 8 6 14 14 14s14-6 14-14C31 14 25 2 17 2z" fill="#fff" stroke="#2B1400" stroke-width="2"/><ellipse cx="12" cy="14" rx="3.4" ry="5" fill="#FFF8EC" opacity=".9"/></svg></div>
+<div id="fallEgg"><svg viewBox="0 0 34 40"><path d="M17 2C9 2 3 14 3 24c0 8 6 14 14 14s14-6 14-14C31 14 25 2 17 2z" fill="#fff" stroke="#2B1400" stroke-width="2"/><ellipse cx="12" cy="14" rx="3.4" ry="5" fill="#FFF8EC" opacity=".9"/></svg></div>
       <div id="shellL"><svg viewBox="0 0 34 40"><path d="M17 2C9 2 3 14 3 24l4-3 5 4 5-5v-2z" fill="#fff" stroke="#2B1400" stroke-width="2"/></svg></div>
       <div id="shellR"><svg viewBox="0 0 34 40"><path d="M17 2c8 0 14 12 14 22l-4-3-5 4-5-5v-2z" fill="#fff" stroke="#2B1400" stroke-width="2"/></svg></div>
+</div>
+
+<div id="finale" aria-hidden="true">
+  <div class="fin-egg" data-x="8" data-y="16" style="width:110px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+  <div class="fin-egg" data-x="26" data-y="8" style="width:80px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+  <div class="fin-egg" data-x="46" data-y="14" style="width:130px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+  <div class="fin-egg" data-x="66" data-y="7" style="width:90px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+  <div class="fin-egg" data-x="85" data-y="15" style="width:105px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+  <div class="fin-egg" data-x="10" data-y="44" style="width:90px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+  <div class="fin-egg" data-x="33" data-y="54" style="width:120px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+  <div class="fin-egg" data-x="58" data-y="48" style="width:85px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+  <div class="fin-egg" data-x="83" data-y="44" style="width:115px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+  <div class="fin-egg" data-x="20" data-y="78" style="width:100px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+  <div class="fin-egg" data-x="50" data-y="80" style="width:130px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+  <div class="fin-egg" data-x="78" data-y="76" style="width:95px"><svg viewBox="0 0 100 95"><path d="M50 6c14 0 19 9 30 13 11 4 15 17 10 28s3 20-9 28c-10 7-19 10-31 10-14 0-26-3-35-12C6 64 4 55 9 43 14 33 11 24 20 17s16-11 30-11z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="53" cy="49" r="18" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="47" cy="43" rx="6" ry="4" fill="#fff" opacity=".8"/></svg></div>
+</div>
+<div id="cur" aria-hidden="true">
+  <svg class="c-egg" viewBox="0 0 34 40"><path d="M17 2C9 2 3 14 3 24c0 8 6 14 14 14s14-6 14-14C31 14 25 2 17 2z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><ellipse cx="12" cy="14" rx="3.4" ry="5" fill="#FFF8EC" opacity=".9"/></svg>
+  <svg class="c-crack" viewBox="0 0 34 40"><path d="M17 2C9 2 3 14 3 24c0 8 6 14 14 14s14-6 14-14C31 14 25 2 17 2z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><path class="crackline" d="M5 21l5 3 4-4 4 5 5-4 5 3" fill="none" stroke="#2B1400" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="12" cy="12" rx="3" ry="4.4" fill="#FFF8EC" opacity=".9"/></svg>
+  <svg class="c-shl" viewBox="0 0 34 40"><path d="M17 2C9 2 3 14 3 24l4-3 5 4 5-5v-2z" fill="#fff" stroke="#2B1400" stroke-width="2"/></svg>
+  <svg class="c-shr" viewBox="0 0 34 40"><path d="M17 2c8 0 14 12 14 22l-4-3-5 4-5-5v-2z" fill="#fff" stroke="#2B1400" stroke-width="2"/></svg>
+  <svg class="c-fried" viewBox="0 0 44 40"><path d="M22 3c6 0 8 4 13 6 5 2 6 7 4 12s1 8-4 12c-4 3-8 4-13 4-6 0-11-1-15-5C3 28 2 24 4 19c2-4 1-8 5-11s7-5 13-5z" fill="#fff" stroke="#2B1400" stroke-width="2.5"/><circle cx="23" cy="21" r="8" fill="#F9C409" stroke="#D9A400" stroke-width="1.5"/><ellipse cx="20.5" cy="18.5" rx="2.6" ry="1.8" fill="#fff" opacity=".8"/></svg>
+</div>
+
+<div id="bgStack" aria-hidden="true"><div class="bg-layer" data-c="cream" style="background:#FFF8EC"></div><div class="bg-layer" data-c="yellow" style="background:#F9C409"></div><div class="bg-layer" data-c="sand" style="background:#F2E9DC"></div></div><div class="bg-layer" style="background:#FFF8EC"></div><div class="bg-layer" style="background:#FFFFFF"></div><div class="bg-layer" style="background:#F9C409"></div><div class="bg-layer" style="background:#F2E9DC"></div><div class="bg-layer" style="background:#FFFFFF"></div></div>
+
+<!-- ================= NAV ================= -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="Protein Wala Banda — home">
+      <span class="egg-badge" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><path d="M20 4c-4 0-6 2-9 4s-5 4-5 9c0 3 1 5 0 8s2 8 7 9 10 1 14-1 7-4 7-9c0-3-2-4-1-8s-2-7-5-9-4-3-8-3z" fill="#FFF8EC"/><circle cx="21" cy="21" r="7" fill="#F9C409"/><ellipse cx="19" cy="19" rx="2.4" ry="1.6" fill="#fff" opacity=".85"/></svg>
+      </span>
+      <span class="name">Protein Wala B,anda</span>
+    </a>
+    <div class="nav-right">
+      <nav class="links" id="navLinks" aria-label="Main navigation">
+        <a href="#kahani">Our Story</a>
+        <a href="#loyalty">Loyalty Card</a>
+        <a href="#giveaway">Giveaway</a>
+        <a href="#location">Location</a>
+      </nav>
+      <a class="nav-cta" href="#location">Find the Stall 📍</a>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">Menu ☰</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+<!-- ================= HERO (pinned scene: egg falls into the pan) ================= -->
+<div class="hero-pin">
+<section class="hero hero-sticky" aria-label="Welcome">
+  <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="hero-grid">
+    <div>
+      <span class="pill-kicker">🥚 Ande Ka Funda, Protein Ka Dhanda</span>
+      <h1>Garma Garam <span class="yellow">Anda,</span><br>Dil Khush Kare Banda</h1>
+      <p class="lede">
+        High protein street food, made fresh on the tawa and served hot in minutes.
+        Simple, honest and seriously satisfying.
+      </p>
+      <div class="btn-row">
+        <a class="btn btn-yellow" href="#location">Visit the Stall</a>
+        <a class="btn btn-outline-light" href="#loyalty">Get Your Loyalty Card</a>
+      </div>
+      <p class="hero-hint">🥚 Psst… your cursor is an egg. Hover a button to crack it, click to fry it!</p>
+    </div>
+    <div class="pan-wrap" aria-hidden="true">
+      <div class="pan-space"></div>
     </div>
   </div>
   <div class="scroll-hint" id="scrollHint">Scroll<span class="sh-egg"></span></div>
@@ -989,16 +1028,24 @@ section > .wrap{position:relative;z-index:1;will-change:transform}
   var eyes = document.querySelectorAll('.egg-buddy .eye');
   if(!eyes.length || window.matchMedia('(hover: none)').matches) return;
   var raf = null, mx = 0, my = 0;
+  var eyeC = [];
+  function measureEyes(){
+    eyeC = Array.prototype.map.call(eyes, function(eye){
+      var w = eye.querySelector('.ew').getBoundingClientRect();
+      return {x: w.left + w.width/2, y: w.top + w.height/2, w: w.width};
+    });
+  }
+  measureEyes();
+  window.addEventListener('resize', measureEyes);
   document.addEventListener('mousemove', function(e){
     mx = e.clientX; my = e.clientY;
     if(!raf) raf = requestAnimationFrame(update);
   });
   function update(){
     raf = null;
-    eyes.forEach(function(eye){
-      var w = eye.querySelector('.ew').getBoundingClientRect();
-      var cx = w.left + w.width/2, cy = w.top + w.height/2;
-      var dx = mx - cx, dy = my - cy;
+    eyes.forEach(function(eye, ei){
+      var c = eyeC[ei] || {x:0,y:0};
+      var dx = mx - c.x, dy = my - c.y;
       var d = Math.hypot(dx, dy) || 1;
       var reach = Math.min(1, d / 40);          /* nearby cursor = subtler look */
       var max = 6 * reach;                      /* max pupil travel in SVG units */
@@ -1092,10 +1139,13 @@ section > .wrap{position:relative;z-index:1;will-change:transform}
 })();
 
 /* ============================================================
-   3D SCROLL ENGINE v3 — CONTINUOUS full-page 3D
-   Every element lives on a depth curve: tilted back rising from
-   the bottom, flat at screen center, tilting forward as it leaves
-   the top. One writer owns every transform (no fighting = no glitch).
+   3D ENGINE v6 — EVENT-DRIVEN, BUILT FOR SMOOTHNESS
+   Scrolling runs on the browser's native compositor. JavaScript
+   only reacts to events: entrances fire once via
+   IntersectionObserver + CSS transitions, the background
+   crossfades when you reach a section, the egg finale triggers
+   near the end. The only scrubbed piece is the hero egg-crack
+   scene, active only while the hero is on screen.
    ============================================================ */
 (function(){
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1103,207 +1153,204 @@ section > .wrap{position:relative;z-index:1;will-change:transform}
   var fallEgg = document.getElementById('fallEgg');
   var shellL = document.getElementById('shellL');
   var shellR = document.getElementById('shellR');
+  var panLayer = document.getElementById('panLayer');
+  var panSpace = document.querySelector('.pan-space');
   var isMobile = window.matchMedia('(max-width: 920px)').matches;
-  if(reduced){
-    if(fallEgg) fallEgg.style.display='none';
-    if(shellL) shellL.style.display='none';
-    if(shellR) shellR.style.display='none';
-    return;
-  }
-  if(friedNew && !isMobile) friedNew.style.opacity = '0';
 
   function clamp01(v){ return v<0?0:(v>1?1:v); }
   function easeOut(p){ return 1 - Math.pow(1-p, 3); }
   function seg(p,a,b){ return clamp01((p-a)/(b-a)); }
 
-  /* ---------- continuous depth items ---------- */
-  var items = [];
-  function add(el, tr, o){
-    if(!el) return;
-    el.style.willChange = 'transform,opacity';
-    el.style.transition = 'none';
-    el._hT = '';
-    items.push({el:el, tr:tr||el, rx:o.rx||0, ry:o.ry||0, z:o.z||0,
-      fade:(o.fade!=null?o.fade:.5), persp:o.persp||1100, base:o.base||'', pop:o.pop||0});
+  /* pan always parks over its hero slot (math below keeps it there) */
+  if(reduced){
+    if(fallEgg) fallEgg.style.display='none';
+    if(shellL) shellL.style.display='none';
+    if(shellR) shellR.style.display='none';
+    if(panLayer && panSpace){
+      var rr = panSpace.getBoundingClientRect();
+      var sc = rr.width / (panLayer.getBoundingClientRect().width || 440);
+      panLayer.style.transformOrigin = '0 0';
+      panLayer.style.transform = 'translate3d(' + rr.left + 'px,' + rr.top + 'px,0) scale(' + sc + ')';
+    }
+    return;
   }
-  document.querySelectorAll('main section .wrap').forEach(function(w){
-    add(w, w.closest('section'), {rx:16, z:150, fade:.42});
-  });
-  document.querySelectorAll('.why-grid .card, .social-grid .social-card').forEach(function(c, i){
-    add(c, c, {rx:7, ry:(i%2 ? 20 : -20), z:100, fade:.5, persp:900});
-  });
-  add(document.getElementById('stampCard'), null, {rx:7, ry:-24, z:110, fade:.5, persp:900, base:'rotate(-2deg)'});
-  add(document.querySelector('.lucky-badge'), null, {z:240, fade:.6, pop:.35, persp:900});
-  add(document.querySelector('.founder-card'), null, {rx:7, ry:-22, z:100, fade:.5, persp:900});
-  add(document.querySelector('.footer-grid'), null, {rx:14, z:110, fade:.35});
+  if(friedNew && !isMobile) friedNew.style.opacity = '0';
 
-  /* ---------- pinned hero scene refs ---------- */
-  var pin = document.querySelector('.hero-pin');
-  var panWrap = document.querySelector('.pan-wrap');
-  var heroGrid = document.querySelector('.hero-grid');
+  /* ---------- entrances: IntersectionObserver + CSS transitions ---------- */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      en.target.classList.toggle('vis', en.isIntersecting);
+    });
+  }, {rootMargin: '-6% 0px -6% 0px', threshold: 0});
+  function tag(el, cls, delay){
+    if(!el) return;
+    el.classList.add('a-in');
+    if(cls) el.classList.add(cls);
+    if(delay) el.style.transitionDelay = delay + 'ms, ' + delay + 'ms';
+    io.observe(el);
+  }
+  document.querySelectorAll('main section .wrap').forEach(function(w){ tag(w); });
+  document.querySelectorAll('.why-grid .card, .social-grid .social-card').forEach(function(c, i){
+    tag(c, (i%2 ? 'a-flip-r' : 'a-flip-l'), (i%3)*90);
+  });
+  tag(document.getElementById('stampCard'), 'a-tilt');
+  tag(document.querySelector('.lucky-badge'), 'a-pop');
+  tag(document.querySelector('.founder-card'), 'a-flip-l');
+  tag(document.querySelector('.footer-grid'));
+
+  /* ---------- cached geometry (measured once + on resize) ---------- */
+  var vw=0, vh=0, maxSy=1, pinTop=0, pinH=1, panRelX=0, panRelY=0, panLW=440, heroScale=1;
   var heroText = document.querySelector('.hero-grid > div:first-child');
   var hint = document.getElementById('scrollHint');
-  var hero = document.querySelector('.hero');
-  var tiltX = 0, tiltY = 0;
+  var pin = document.querySelector('.hero-pin');
 
-  /* ---------- floating eggs ---------- */
-  var paras = [];
-  document.querySelectorAll('.float-egg').forEach(function(e, i){
-    paras.push({el:e, sec:e.closest('section'), amp:(i%2 ? -90 : 90), rot:(i%2 ? 38 : -30)});
-  });
-
-  /* ---------- background morph stops ---------- */
-  var morph = document.getElementById('bgMorph');
-  var stops = [];
-  [['#kahani',[255,255,255]], ['#why',[255,248,236]], ['#loyalty',[255,255,255]],
-   ['#giveaway',[249,196,9]], ['#location',[242,233,220]], ['#social',[255,255,255]]]
+  var bgStops = [];
+  [['#kahani','white'],['#why','cream'],['#loyalty','white'],
+   ['#giveaway','yellow'],['#location','sand'],['#social','white']]
   .forEach(function(s){
     var el = document.querySelector(s[0]);
-    if(el) stops.push({el:el, c:s[1]});
+    if(el) bgStops.push({el:el, c:0, name:s[1]});
   });
-  function mix(a,b,t){ return Math.round(a+(b-a)*t); }
+  var bgLayerEls = {};
+  document.querySelectorAll('#bgStack .bg-layer').forEach(function(l){ bgLayerEls[l.dataset.c] = l; });
 
-  var raf = null;
+  var finEggs = Array.prototype.slice.call(document.querySelectorAll('.fin-egg'))
+    .map(function(el, i){
+      el.style.transition = 'transform .8s cubic-bezier(.3,1.35,.5,1) ' + (i*70) + 'ms, opacity .4s ease ' + (i*70) + 'ms';
+      return {el:el, w: parseFloat(el.style.width)||100,
+        x: parseFloat(el.dataset.x), y: parseFloat(el.dataset.y), start:'', fin:''};
+    });
+
+  function measure(){
+    vw = window.innerWidth; vh = window.innerHeight;
+    var sy = window.scrollY;
+    maxSy = Math.max(1, document.documentElement.scrollHeight - vh);
+    if(pin){
+      var pr = pin.getBoundingClientRect();
+      pinTop = pr.top + sy; pinH = pr.height;
+    }
+    if(panLayer && panSpace){
+      panLW = panLayer.getBoundingClientRect().width || 440;
+      var hs = document.querySelector('.hero-sticky').getBoundingClientRect();
+      var ps = panSpace.getBoundingClientRect();
+      panRelX = ps.left + ps.width/2;
+      panRelY = (ps.top - hs.top) + ps.height/2;
+      heroScale = ps.width / panLW;
+    }
+    bgStops.forEach(function(s){
+      var r = s.el.getBoundingClientRect();
+      s.c = r.top + sy + r.height/2;
+    });
+    finEggs.forEach(function(fe){
+      var tx = fe.x/100*vw - fe.w/2, ty = fe.y/100*vh - fe.w/2;
+      fe.start = 'translate3d(' + tx.toFixed(0) + 'px,' + (vh*1.15).toFixed(0) + 'px,0) rotate(-160deg) scale(.3)';
+      fe.fin = 'translate3d(' + tx.toFixed(0) + 'px,' + ty.toFixed(0) + 'px,0) rotate(0deg) scale(1)';
+      if(!fe.el.style.transform) fe.el.style.transform = fe.start;
+    });
+    onScroll();
+  }
+
+  /* ---------- the one lightweight scroll handler ---------- */
+  var raf = null, lastBg = -2, boom = false, heroDoneWritten = false;
   function tick(){
     raf = null;
-    var vh = window.innerHeight;
+    var sy = window.scrollY;
 
-    /* --- continuous full-page 3D: every item follows the depth curve --- */
-    for(var i=0;i<items.length;i++){
-      var it = items[i];
-      var r = it.tr.getBoundingClientRect();
-      if(r.bottom < -vh || r.top > vh*2){ continue; }        /* far off-screen: skip work */
-      var d = (r.top + r.height/2 - vh/2) / (vh/2 + r.height/2);
-      d = Math.max(-1, Math.min(1, d));
-      var f = d * Math.abs(d);                                /* smooth through center */
-      var t = 'perspective(' + it.persp + 'px)';
-      if(it.rx) t += ' rotateX(' + (it.rx*f).toFixed(2) + 'deg)';
-      if(it.ry) t += ' rotateY(' + (it.ry*f).toFixed(2) + 'deg)';
-      t += ' translateZ(' + (-Math.abs(f)*it.z).toFixed(1) + 'px)';
-      if(it.pop) t += ' scale(' + (1 - Math.abs(f)*it.pop).toFixed(3) + ')';
-      it.el.style.transform = t + (it.base ? ' ' + it.base : '') + (it.el._hT ? ' ' + it.el._hT : '');
-      it.el.style.opacity = (1 - Math.abs(f)*it.fade).toFixed(3);
+    /* hero egg-crack scene: only while the hero is on screen */
+    if(sy < pinTop + pinH){
+      heroDoneWritten = false;
+      var hp = clamp01((sy - pinTop) / (pinH - vh));
+      if(!isMobile){
+        var fp = seg(hp, .02, .42), f2 = fp*fp;
+        var cracked = fp >= 1;
+        if(fallEgg){
+          fallEgg.style.opacity = (!cracked && hp > 0.005) ? '1' : '0';
+          if(!cracked) fallEgg.style.transform =
+            'translate(-50%,-50%) translateY(' + (-(1-f2)*.42*vh).toFixed(1) + 'px) rotate(' + (Math.sin(fp*6.5)*14).toFixed(1) + 'deg)';
+        }
+        var sp = seg(hp,.42,.64), spe = easeOut(sp);
+        if(shellL){
+          shellL.style.opacity = (cracked && sp < 1) ? String((1-sp).toFixed(2)) : '0';
+          shellL.style.transform = 'translate(-50%,-50%) translate(' + (-95*spe).toFixed(1) + 'px,' + (-70*spe + 130*sp*sp).toFixed(1) + 'px) rotate(' + (-110*spe).toFixed(1) + 'deg)';
+        }
+        if(shellR){
+          shellR.style.opacity = (cracked && sp < 1) ? String((1-sp).toFixed(2)) : '0';
+          shellR.style.transform = 'translate(-50%,-50%) translate(' + (95*spe).toFixed(1) + 'px,' + (-60*spe + 130*sp*sp).toFixed(1) + 'px) rotate(' + (105*spe).toFixed(1) + 'deg)';
+        }
+        if(friedNew){
+          var fs = easeOut(seg(hp,.42,.58));
+          friedNew.style.opacity = cracked ? String(fs.toFixed(2)) : '0';
+          friedNew.style.transform = 'scale(' + (.4 + .6*fs).toFixed(3) + ')';
+        }
+        var te = seg(hp,.55,1);
+        if(heroText){
+          heroText.style.transform = 'translate3d(0,' + (-te*55).toFixed(1) + 'px,0)';
+          heroText.style.opacity = (1 - te*.8).toFixed(2);
+        }
+        if(hint) hint.style.opacity = String((1 - seg(hp,0,.12)).toFixed(2));
+      }
+      /* pan parked over its slot (sticky position derived mathematically) */
+      if(panLayer && panSpace){
+        var ctv = pinTop - sy;
+        var stickyTopV = ctv > 0 ? ctv : (ctv + pinH - vh < 0 ? ctv + pinH - vh : 0);
+        var lh = panLW * 320/380;
+        var pj = seg(hp,.42,.56), squash = Math.sin(pj*Math.PI)*.05;
+        panLayer.style.opacity = String((1 - seg(sy, pinTop + pinH - vh, pinTop + pinH - vh*.3)).toFixed(2));
+        panLayer.style.transform =
+          'translate3d(' + (panRelX - panLW/2).toFixed(1) + 'px,' + (stickyTopV + panRelY - lh/2).toFixed(1) + 'px,0)' +
+          ' scale(' + (heroScale*(1+squash)).toFixed(3) + ',' + (heroScale*(1-squash)).toFixed(3) + ')';
+      }
+    } else if(!heroDoneWritten){
+      if(panLayer) panLayer.style.opacity = '0';
+      heroDoneWritten = true;
     }
 
-    /* --- hero pinned timeline: egg falls, cracks, fries --- */
-    if(pin && !isMobile){
-      var pr = pin.getBoundingClientRect();
-      var hp = clamp01(-pr.top / (pr.height - vh));
-      var fp = seg(hp, .02, .42), f2 = fp*fp;
-      var cracked = fp >= 1;
-      if(fallEgg){
-        fallEgg.style.opacity = (!cracked && hp > 0.005) ? '1' : '0';
-        if(!cracked) fallEgg.style.transform =
-          'translate(-50%,-50%) translateY(' + (-(1-f2)*.42*vh).toFixed(1) + 'px) rotate(' + (Math.sin(fp*6.5)*14).toFixed(1) + 'deg)';
+    /* background crossfade: pick nearest section, CSS transition does the rest */
+    if(bgStops.length){
+      var mid = sy + vh*.5, ki = 0, best = 1e18;
+      for(var q=0;q<bgStops.length;q++){
+        var dd = Math.abs(bgStops[q].c - mid);
+        if(dd < best){ best = dd; ki = q; }
       }
-      var sp = seg(hp,.42,.64), spe = easeOut(sp);
-      if(shellL){
-        shellL.style.opacity = (cracked && sp < 1) ? String((1-sp).toFixed(2)) : '0';
-        shellL.style.transform = 'translate(-50%,-50%) translate(' + (-95*spe).toFixed(1) + 'px,' + (-70*spe + 130*sp*sp).toFixed(1) + 'px) rotate(' + (-110*spe).toFixed(1) + 'deg)';
-      }
-      if(shellR){
-        shellR.style.opacity = (cracked && sp < 1) ? String((1-sp).toFixed(2)) : '0';
-        shellR.style.transform = 'translate(-50%,-50%) translate(' + (95*spe).toFixed(1) + 'px,' + (-60*spe + 130*sp*sp).toFixed(1) + 'px) rotate(' + (105*spe).toFixed(1) + 'deg)';
-      }
-      if(friedNew){
-        var fs = easeOut(seg(hp,.42,.58));
-        friedNew.style.opacity = cracked ? String(fs.toFixed(2)) : '0';
-        friedNew.style.transform = 'scale(' + (.4 + .6*fs).toFixed(3) + ')';
-      }
-      var pj = seg(hp,.42,.56), squash = Math.sin(pj*Math.PI)*.05;
-      var px = easeOut(seg(hp,.64,1));
-      if(panWrap) panWrap.style.transform =
-        'perspective(900px) rotateX(' + (px*22).toFixed(1) + 'deg) translate3d(0,' + (px*80 + squash*50).toFixed(1) + 'px,' + (-px*150).toFixed(1) + 'px) scale(' + (1+squash).toFixed(3) + ',' + (1-squash).toFixed(3) + ')';
-      var te = seg(hp,.55,1);
-      if(heroText){
-        heroText.style.transform = 'translate3d(0,' + (-te*55).toFixed(1) + 'px,0)';
-        heroText.style.opacity = (1 - te*.8).toFixed(2);
-      }
-      if(hint) hint.style.opacity = String((1 - seg(hp,0,.12)).toFixed(2));
-      if(heroGrid) heroGrid.style.transform =
-        'perspective(1100px) rotateX(' + tiltX.toFixed(2) + 'deg) rotateY(' + tiltY.toFixed(2) + 'deg)';
-    }
-
-    /* --- parallax eggs --- */
-    for(var j=0;j<paras.length;j++){
-      var pa = paras[j];
-      var sr = pa.sec.getBoundingClientRect();
-      if(sr.bottom < 0 || sr.top > vh) continue;
-      var pp = clamp01((vh - sr.top) / (vh + sr.height));
-      pa.el.style.transform = 'translate3d(0,' + ((pp-.5)*2*pa.amp).toFixed(1) + 'px,0) rotate(' + ((pp-.5)*2*pa.rot).toFixed(1) + 'deg)';
-    }
-
-    /* --- seamless background morph --- */
-    if(morph && stops.length){
-      var mid = vh * .5, c = null;
-      var centers = stops.map(function(s){
-        var rr = s.el.getBoundingClientRect();
-        return {y: rr.top + rr.height/2, c: s.c};
-      });
-      if(mid <= centers[0].y) c = centers[0].c;
-      else if(mid >= centers[centers.length-1].y) c = centers[centers.length-1].c;
-      else for(var k=0;k<centers.length-1;k++){
-        if(mid >= centers[k].y && mid <= centers[k+1].y){
-          var tt = (mid - centers[k].y) / (centers[k+1].y - centers[k].y);
-          c = [mix(centers[k].c[0],centers[k+1].c[0],tt),
-               mix(centers[k].c[1],centers[k+1].c[1],tt),
-               mix(centers[k].c[2],centers[k+1].c[2],tt)];
-          break;
+      if(ki !== lastBg){
+        lastBg = ki;
+        var name = bgStops[ki].name;
+        for(var key in bgLayerEls){
+          bgLayerEls[key].style.opacity = (key === name) ? '1' : '0';
         }
       }
-      if(c) morph.style.background = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+    }
+
+    /* finale: trigger once near the end, CSS transitions animate the burst */
+    var nowBoom = sy > maxSy - vh*.8;
+    if(nowBoom !== boom){
+      boom = nowBoom;
+      finEggs.forEach(function(fe){
+        fe.el.style.opacity = boom ? '1' : '0';
+        fe.el.style.transform = boom ? fe.fin : fe.start;
+      });
     }
   }
   function onScroll(){ if(!raf) raf = requestAnimationFrame(tick); }
   window.addEventListener('scroll', onScroll, {passive:true});
-  window.addEventListener('resize', onScroll);
-  tick();
+  window.addEventListener('resize', measure);
+  window.addEventListener('load', measure);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+  setTimeout(measure, 1500);
+  measure();
 
-  /* ---------- smooth inertial wheel scrolling ---------- */
-  if(window.matchMedia('(hover: hover) and (pointer: fine)').matches){
-    var target = window.scrollY, current = window.scrollY, gliding = false, self = false;
-    function maxScroll(){ return document.documentElement.scrollHeight - window.innerHeight; }
-    window.addEventListener('wheel', function(e){
-      if(e.ctrlKey) return;
-      e.preventDefault();
-      var d = e.deltaY;
-      if(e.deltaMode === 1) d *= 16; else if(e.deltaMode === 2) d *= window.innerHeight;
-      target = Math.max(0, Math.min(maxScroll(), target + d));
-      if(!gliding){ gliding = true; requestAnimationFrame(glide); }
-    }, {passive:false});
-    function glide(){
-      current += (target - current) * .14;
-      if(Math.abs(target - current) < .5){ current = target; gliding = false; }
-      self = true; window.scrollTo(0, current); self = false;
-      if(gliding) requestAnimationFrame(glide);
-    }
-    window.addEventListener('scroll', function(){
-      if(!self && !gliding){ target = current = window.scrollY; }
-    }, {passive:true});
-  }
-
-  /* ---------- hero mouse tilt ---------- */
-  if(hero && window.matchMedia('(hover: hover)').matches){
-    hero.addEventListener('mousemove', function(e){
-      var r = hero.getBoundingClientRect();
-      tiltX = ((e.clientY - r.top)/r.height - .5) * -5;
-      tiltY = ((e.clientX - r.left)/r.width - .5) * 7;
-      onScroll();
-    });
-    hero.addEventListener('mouseleave', function(){ tiltX = 0; tiltY = 0; onScroll(); });
-  }
-
-  /* ---------- 3D hover tilt, composed with scroll depth (no fighting) ---------- */
+  /* ---------- 3D hover tilt on cards (event-driven, inline) ---------- */
   if(window.matchMedia('(hover: hover)').matches){
     document.querySelectorAll('.card, .social-card, .founder-card').forEach(function(el){
+      var hr = null;
+      el.addEventListener('mouseenter', function(){ hr = el.getBoundingClientRect(); });
       el.addEventListener('mousemove', function(e){
-        var r = el.getBoundingClientRect();
-        var rx = ((e.clientY - r.top)/r.height - .5) * -8;
-        var ry = ((e.clientX - r.left)/r.width - .5) * 8;
-        el._hT = 'rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateY(-6px)';
-        onScroll();
+        if(!hr) return;
+        var rx = ((e.clientY - hr.top)/hr.height - .5) * -8;
+        var ry = ((e.clientX - hr.left)/hr.width - .5) * 8;
+        el.style.transform = 'perspective(800px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateY(-6px)';
       });
-      el.addEventListener('mouseleave', function(){ el._hT = ''; onScroll(); });
+      el.addEventListener('mouseleave', function(){ hr = null; el.style.transform = ''; });
     });
   }
 })();
